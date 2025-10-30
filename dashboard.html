@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar.mobile-hidden {
+            transform: translateX(-100%);
+        }
+
+        .logo {
+            padding: 30px 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 30px;
+        }
+
+        .menu-item.active {
+            background: rgba(255,255,255,0.2);
+            border-left: 4px solid white;
+        }
+
+        .menu-item span {
+            font-size: 20px;
+        }
+
+        /* Main Content */
+        .content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .content.full-width {
+            margin-left: 0;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .language-selector {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Dashboard Content */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .add-medicine-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .add-medicine-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* Medicine Entry CSS */
+        .medicine-entry {
+            border: 1px dashed #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .remove-entry-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .medicine-list {
+            margin-top: 20px;
+        }
+
+        .medicine-item {
+            background: #f5f7fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .medicine-info h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .medicine-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .medicine-doses {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+
+        .dose-item, .history-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .history-item.skipped {
+            border-left-color: #f44336;
+        }
+        
+        .history-item.taken {
+            border-left-color: #4caf50;
+        }
+
+        /* Other styles (Chatbot, Notification) remain the same */
+        .chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1500;
+        }
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+        .chatbot-window {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            flex-direction: column;
+            animation: fadeIn 0.3s;
+        }
+        .chatbot-window.active {
+            display: flex;
+        }
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            font-weight: bold;
+        }
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .chatbot-message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        .chatbot-message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+        .chatbot-message.bot {
+            background: #f5f7fa;
+            color: #333;
+        }
+        .chatbot-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .chatbot-input input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            background: #f5f7fa;
+        }
+        .chatbot-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .notification {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 3000;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .notification.active {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+        @keyframes slideIn {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .notification h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .notification-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-taken {
+            background: #4caf50;
+            color: white;
+        }
+        .btn-skip {
+            background: #f44336;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-visible {
+                transform: translateX(0);
+            }
+            .content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .chatbot-window {
+                width: calc(100vw - 40px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="sidebar" id="sidebar">
+            <div class="logo">💊 MediTrack</div>
+            <div class="menu">
+                <a href="#" class="menu-item active" onclick="showSection('dashboard')" data-translate="dashboard">
+                    <span>📊</span> <span data-translate="dashboard">Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('progress')" data-translate="progress">
+                    <span>📈</span> <span data-translate="progress">Progress</span>
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('history')" data-translate="history">
+                    <span>📜</span> <span data-translate="history">History</span>
+                </a>
+                <a href="medicine-analyser.html" class="menu-item" data-translate="analyser">
+                    <span>🔬</span> <span data-translate="analyser">Medicine Analyser</span>
+                </a>
+                <a href="profile.html" class="menu-item" data-translate="profile">
+                    <span>👤</span> <span data-translate="profile">Profile</span>
+                </a>
+                <a href="settings.html" class="menu-item" data-translate="settings">
+                    <span>⚙️</span> <span data-translate="settings">Settings</span>
+                </a>
+                <a href="#" class="menu-item" onclick="logout()" data-translate="logout">
+                    <span>🚪</span> <span data-translate="logout">Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="content" id="content">
+            <div class="header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+                <h1 data-translate="welcomeMessage">Welcome Back!</h1>
+                <div class="header-actions">
+                    <select class="language-selector" id="languageSelector" onchange="changeLanguage()">
+                        <option value="en">English</option>
+                        <option value="ta">தமிழ்</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                        <option value="ml">മലയാളம்</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="dashboardSection" class="section">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3 data-translate="addNewMedicine">Add New Medicine</h3>
+                        <button class="add-medicine-btn" onclick="openAddMedicineModal()" data-translate="addMedicineBtn">
+                            + Add Medicine
+                        </button>
+                    </div>
+                    <div class="card">
+                        <h3 data-translate="todaysMedicines">Today's Medicines</h3>
+                        <div id="todaysMedicines">
+                            <p data-translate="noMedicines">No medicines scheduled for today</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 data-translate="upcomingDoses">Upcoming Doses</h3>
+                        <div id="upcomingDoses">
+                            <p data-translate="noUpcomingDoses">No upcoming doses</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 data-translate="yourMedicines">Your Medicines</h3>
+                    <div class="medicine-list" id="medicineList">
+                        <p data-translate="noMedicinesAdded">No medicines added yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="progressSection" class="section" style="display: none;">
+                <div class="card">
+                    <h3 data-translate="medicationProgress">Medication Progress</h3>
+                    <div id="progressContent">
+                        <p data-translate="noProgress">No medication history found to show progress.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="historySection" class="section" style="display: none;">
+                <div class="card">
+                    <h3 data-translate="medicationHistory">Medication History</h3>
+                    <div id="historyContent">
+                         <p data-translate="noHistory">No medication history found.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addMedicineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-translate="addNewMedicine">Add New Medicine</h2>
+                <button class="close-btn" onclick="closeAddMedicineModal()">×</button>
+            </div>
+            <form onsubmit="addMedicine(event)" id="medicineForm">
+                <div id="medicineEntries">
+                    <div class="medicine-entry">
+                        <div class="form-group">
+                            <label data-translate="medicineName">Medicine Name</label>
+                            <input type="text" class="medicine-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="dosage">Dosage (e.g., 50mg)</label>
+                            <input type="text" class="medicine-dosage" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="timing">Time</label>
+                            <input type="time" class="medicine-time" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="duration">Duration (days)</label>
+                            <input type="number" class="medicine-duration" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="tablets">Tablets per dose</label>
+                            <input type="number" class="medicine-tablets" min="1" value="1" required>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="add-medicine-btn" onclick="addAnotherMedicine()" style="margin-bottom: 15px;" data-translate="addAnotherMedicine">
+                    + Add Another Medicine
+                </button>
+                <button type="submit" class="add-medicine-btn" data-translate="submitBtn">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <h3 data-translate="medicineReminder">Medicine Reminder! 💊</h3>
+        <p id="notificationMessage"></p>
+        <div class="notification-actions">
+            <button class="notification-btn btn-taken" onclick="markAsTaken()" data-translate="taken">✓ Taken</button>
+            <button class="notification-btn btn-skip" onclick="skipDose()" data-translate="skip">✗ Skip</button>
+        </div>
+        <button class="notification-btn" onclick="stopNotification(true)" style="margin-top: 10px; background: #999;" data-translate="stopToday">Stop for Today</button>
+    </div>
+
+    <div class="modal" id="skipReasonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-translate="whySkip">Why did you skip?</h2>
+                <button class="close-btn" onclick="closeSkipModal()">×</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="add-medicine-btn" onclick="selectSkipReason('Forgot to take')" data-translate="forgot">Forgot to take</button>
+                <button class="add-medicine-btn" onclick="selectSkipReason('Not feeling well')" data-translate="notWell">Not feeling well</button>
+                <button class="add-medicine-btn" onclick="selectSkipReason('Out of stock')" data-translate="outOfStock">Out of stock</button>
+                <button class="add-medicine-btn" onclick="selectSkipReason('Side effects')" data-translate="sideEffects">Side effects</button>
+                <button class="add-medicine-btn" onclick="selectSkipReason('Other reason')" data-translate="otherReason">Other reason</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="chatbot">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">💬</button>
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header" data-translate="chatbotTitle">MediTrack Assistant</div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chatbot-message bot" data-translate="chatbotWelcome">Hello! I'm your medicine assistant. Ask me anything about medicines, symptoms, or your medication schedule!</div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbotInput" placeholder="Type your message..." onkeydown="if(event.key === 'Enter') sendChatMessage()">
+                <button onclick="sendChatMessage()" data-translate="send">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="notificationSound" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVEKBgABAwMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fICEiIyQlJicpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/wABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fICEiIyQlJicpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="></audio>
+
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, 
+            query, where, updateDoc, addDoc, onSnapshot, orderBy, Timestamp 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDErLV4jxywlK5bVYFVwylQ6z2wgo-1f-w",
+            authDomain: "developers-man.firebaseapp.com",
+            databaseURL: "https://developers-man-default-rtdb.firebaseio.com",
+            projectId: "developers-man",
+            storageBucket: "developers-man.firebasestorage.app",
+            messagingSenderId: "34230860300",
+            appId: "1:34230860300:web:048c7679e3e62ae0290c29",
+            measurementId: "G-9WH11XR9JM"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global variables
+        let currentUserId = null;
+        let userMedicines = []; // To store all medicines for real-time checks
+        let medicationHistory = []; // To store history for real-time checks
+        let currentNotification = null; // To store medicine object for notification
+        let notificationInterval = null; // To store the interval ID
+        let currentSoundInterval = null; // To store the 10s sound timeout
+        let notificationSound = document.getElementById('notificationSound');
+
+        // --- TRANSLATION LOGIC (Embedded) ---
+        const translations = {
+            en: {
+                welcomeMessage: "Welcome Back!",
+                dashboard: "Dashboard",
+                progress: "Progress",
+                history: "History",
+                analyser: "Medicine Analyser",
+                profile: "Profile",
+                settings: "Settings",
+                logout: "Logout",
+                addNewMedicine: "Add New Medicine",
+                addMedicineBtn: "+ Add Medicine",
+                todaysMedicines: "Today's Medicines",
+                noMedicines: "No medicines scheduled for today",
+                upcomingDoses: "Upcoming Doses",
+                noUpcomingDoses: "No upcoming doses",
+                yourMedicines: "Your Medicines",
+                noMedicinesAdded: "No medicines added yet",
+                medicationProgress: "Medication Progress",
+                noProgress: "No medication history found to show progress.",
+                medicationHistory: "Medication History",
+                noHistory: "No medication history found.",
+                medicineName: "Medicine Name",
+                dosage: "Dosage (e.g., 50mg)",
+                timing: "Time",
+                duration: "Duration (days)",
+                tablets: "Tablets per dose",
+                addAnotherMedicine: "+ Add Another Medicine",
+                submitBtn: "Submit",
+                medicineReminder: "Medicine Reminder! 💊",
+                taken: "✓ Taken",
+                skip: "✗ Skip",
+                stopToday: "Stop for Today",
+                whySkip: "Why did you skip?",
+                forgot: "Forgot to take",
+                notWell: "Not feeling well",
+                outOfStock: "Out of stock",
+                sideEffects: "Side effects",
+                otherReason: "Other reason",
+                chatbotTitle: "MediTrack Assistant",
+                chatbotWelcome: "Hello! I'm your medicine assistant. Ask me anything about medicines, symptoms, or your medication schedule!",
+                send: "Send",
+                chatInputPlaceholder: "Type your message..."
+            },
+            ta: {
+                welcomeMessage: "மீண்டும் வருக!",
+                dashboard: "முகப்பு",
+                progress: "முன்னேற்றம்",
+                history: "வரலாறு",
+                analyser: "மருந்து பகுப்பாய்வி",
+                profile: "சுயவிவரம்",
+                settings: "அமைப்புகள்",
+                logout: "வெளியேறு",
+                addNewMedicine: "புதிய மருந்து சேர்க்கவும்",
+                addMedicineBtn: "+ மருந்து சேர்க்கவும்",
+                todaysMedicines: "இன்றைய மருந்துகள்",
+                noMedicines: "இன்று மருந்துகள் எதுவும் திட்டமிடப்படவில்லை",
+                upcomingDoses: "வரவிருக்கும் மருந்துகள்",
+                noUpcomingDoses: "வரவிருக்கும் மருந்துகள் இல்லை",
+                yourMedicines: "உங்கள் மருந்துகள்",
+                noMedicinesAdded: "இன்னும் மருந்துகள் சேர்க்கப்படவில்லை",
+                medicationProgress: "மருந்து முன்னேற்றம்",
+                noProgress: "முன்னேற்றத்தைக் காட்ட மருந்து வரலாறு எதுவும் இல்லை.",
+                medicationHistory: "மருந்து வரலாறு",
+                noHistory: "மருந்து வரலாறு எதுவும் இல்லை.",
+                medicineName: "மருந்தின் பெயர்",
+                dosage: "அளவு (எ.கா., 50mg)",
+                timing: "நேரம்",
+                duration: "காலம் (நாட்கள்)",
+                tablets: "ஒரு வேளைக்கான மாத்திரைகள்",
+                addAnotherMedicine: "+ மற்றொரு மருந்து சேர்க்கவும்",
+                submitBtn: "சமர்ப்பி",
+                medicineReminder: "மருந்து நினைவூட்டல்! 💊",
+                taken: "✓ எடுத்துக்கொண்டேன்",
+                skip: "✗ தவிர்த்துவிட்டேன்",
+                stopToday: "இன்று நிறுத்து",
+                whySkip: "ஏன் தவிர்த்தீர்கள்?",
+                forgot: "எடுக்க மறந்துவிட்டேன்",
+                notWell: "உடல்நிலை சரியில்லை",
+                outOfStock: "மருந்து கையிருப்பில் இல்லை",
+                sideEffects: "பக்க விளைவுகள்",
+                otherReason: "வேறு காரணம்",
+                chatbotTitle: "மெடிட்ராக் உதவியாளர்",
+                chatbotWelcome: "வணக்கம்! நான் உங்கள் மருந்து உதவியாளர். மருந்துகள், அறிகுறிகள் அல்லது உங்கள் மருந்து அட்டவணை பற்றி என்னிடம் கேளுங்கள்!",
+                send: "அனுப்பு",
+                chatInputPlaceholder: "உங்கள் செய்தியை தட்டச்சு செய்யவும்..."
+            },
+            hi: {
+                welcomeMessage: "वापसी पर स्वागत है!",
+                dashboard: "डैशबोर्ड",
+                progress: "प्रगति",
+                history: "इतिहास",
+                analyser: "दवा विश्लेषक",
+                profile: "प्रोफ़ाइल",
+                settings: "सेटिंग्स",
+                logout: "लॉग आउट",
+                addNewMedicine: "नई दवा जोड़ें",
+                addMedicineBtn: "+ दवा जोड़ें",
+                todaysMedicines: "आज की दवाएं",
+                noMedicines: "आज के लिए कोई दवा निर्धारित नहीं है",
+                upcomingDoses: "आगामी खुराकें",
+                noUpcomingDoses: "कोई आगामी खुराक नहीं",
+                yourMedicines: "आपकी दवाएं",
+                noMedicinesAdded: "अभी तक कोई दवा नहीं जोड़ी गई है",
+                medicationProgress: "दवा की प्रगति",
+                noProgress: "प्रगति दिखाने के लिए कोई दवा इतिहास नहीं मिला।",
+                medicationHistory: "दवा का इतिहास",
+                noHistory: "कोई दवा इतिहास नहीं मिला।",
+                medicineName: "दवा का नाम",
+                dosage: "खुराक (जैसे, 50mg)",
+                timing: "समय",
+                duration: "अवधि (दिन)",
+                tablets: "प्रति खुराक टैबलेट्स",
+                addAnotherMedicine: "+ एक और दवा जोड़ें",
+                submitBtn: "जमा करें",
+                medicineReminder: "दवा अनुस्मारक! 💊",
+                taken: "✓ ले ली",
+                skip: "✗ छोड़ दी",
+                stopToday: "आज के लिए रोकें",
+                whySkip: "आपने क्यों छोड़ी?",
+                forgot: "लेना भूल गया",
+                notWell: "तबीयत ठीक नहीं है",
+                outOfStock: "स्टॉक खत्म हो गया है",
+                sideEffects: "दुष्प्रभाव",
+                otherReason: "अन्य कारण",
+                chatbotTitle: "मेडीट्रैक सहायक",
+                chatbotWelcome: "नमस्ते! मैं आपका दवा सहायक हूँ। मुझसे दवाओं, लक्षणों, या आपके दवा शेड्यूल के बारे में कुछ भी पूछें!",
+                send: "भेजें",
+                chatInputPlaceholder: "अपना संदेश टाइप करें..."
+            }
+            // Add other languages (te, kn, ml) here if needed
+        };
+
+        function setLanguage(lang) {
+            if (!translations[lang]) lang = 'en'; // Default to English
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                } else if (translations['en'][key]) {
+                    el.textContent = translations['en'][key]; // Fallback
+                }
+            });
+            // Update placeholders
+            const chatInput = document.getElementById('chatbotInput');
+            if(chatInput) {
+                chatInput.placeholder = (translations[lang] && translations[lang].chatInputPlaceholder) || translations['en'].chatInputPlaceholder;
+            }
+        }
+
+        function changeLanguage() {
+            const lang = document.getElementById('languageSelector').value;
+            localStorage.setItem('mediTrackLang', lang);
+            setLanguage(lang);
+        }
+        
+        // --- Auth State Listener ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                // Start all real-time listeners
+                setupRealtimeListeners();
+                startNotificationCheck();
+                
+                // Set initial language from storage
+                const savedLang = localStorage.getItem('mediTrackLang') || 'en';
+                document.getElementById('languageSelector').value = savedLang;
+                setLanguage(savedLang);
+            } else {
+                window.location.href = 'index.html';
+                if(notificationInterval) clearInterval(notificationInterval); // Stop checks on logout
+                stopSound(); // Stop any looping sound on logout
+            }
+        });
+
+        // --- SETUP ALL REAL-TIME LISTENERS ---
+        function setupRealtimeListeners() {
+            if (!currentUserId) return;
+
+            // 1. Medicine Listener
+            const medicinesRef = collection(db, 'users', currentUserId, 'medicines');
+            onSnapshot(query(medicinesRef, orderBy("createdAt", "desc")), (snapshot) => {
+                userMedicines = []; // Clear local array
+                const medicineList = document.getElementById('medicineList');
+                medicineList.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    medicineList.innerHTML = `<p data-translate="noMedicinesAdded">No medicines added yet</p>`;
+                } else {
+                    snapshot.forEach((doc) => {
+                        const medicine = { id: doc.id, ...doc.data() };
+                        userMedicines.push(medicine); // Add to local array
+                        
+                        const div = document.createElement('div');
+                        div.className = 'medicine-item';
+                        div.innerHTML = `
+                            <div class="medicine-info">
+                                <h4>${medicine.name}</h4>
+                                <p>Dosage: ${medicine.dosage} | Time: ${medicine.time} | Duration: ${medicine.duration} days | Tablets: ${medicine.tablets}</p>
+                            </div>
+                            <button class="delete-btn" onclick="deleteMedicine('${doc.id}')">Delete</button>
+                        `;
+                        medicineList.appendChild(div);
+                    });
+                }
+                // Update all UI parts that depend on medicines
+                updateTodaysMedicines();
+                updateUpcomingDoses();
+                setLanguage(localStorage.getItem('mediTrackLang') || 'en'); // Re-apply translation
+            }, (error) => {
+                console.error("Error loading medicines: ", error);
+            });
+
+            // 2. History & Progress Listener (This will now work because of the rules)
+            const historyRef = collection(db, 'users', currentUserId, 'medication_history');
+            const sevenDaysAgo = Timestamp.fromDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+
+            onSnapshot(query(historyRef, orderBy("timestamp", "desc")), (snapshot) => {
+                medicationHistory = []; // Clear local history
+                const historyContent = document.getElementById('historyContent');
+                historyContent.innerHTML = '';
+                
+                let takenCount = 0;
+                let skippedCount = 0;
+
+                if (snapshot.empty) {
+                    historyContent.innerHTML = `<p data-translate="noHistory">No medication history found.</p>`;
+                } else {
+                    snapshot.forEach((doc) => {
+                        const log = { id: doc.id, ...doc.data() };
+                        medicationHistory.push(log); // Add to local array
+
+                        // Populate History Tab
+                        const logDate = log.timestamp.toDate().toLocaleString();
+                        const div = document.createElement('div');
+                        div.className = `history-item ${log.status}`;
+                        div.innerHTML = `
+                            <strong>${log.name} (${log.status})</strong>
+                            <p>Time: ${logDate}</p>
+                            ${log.status === 'skipped' ? `<p>Reason: ${log.reason}</p>` : ''}
+                        `;
+                        historyContent.appendChild(div);
+
+                        // Calculate Progress (for last 7 days)
+                        if (log.timestamp.seconds >= sevenDaysAgo.seconds) {
+                            if (log.status === 'taken') takenCount++;
+                            if (log.status === 'skipped') skippedCount++;
+                        }
+                    });
+                }
+                
+                // Update Progress Tab
+                updateProgress(takenCount, skippedCount);
+                setLanguage(localStorage.getItem('mediTrackLang') || 'en'); // Re-apply translation
+            }, (error) => {
+                console.error("Error loading history: ", error);
+            });
+        }
+        
+        // --- UI UPDATE FUNCTIONS ---
+        
+        function updateTodaysMedicines() {
+            const todaysMedicines = document.getElementById('todaysMedicines');
+            todaysMedicines.innerHTML = '';
+            const now = new Date();
+            let count = 0;
+
+            userMedicines.forEach(medicine => {
+                const startDate = new Date(medicine.startDate);
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + parseInt(medicine.duration));
+
+                if (now >= startDate && now < endDate) {
+                    const div = document.createElement('div');
+                    div.className = 'dose-item';
+                    div.innerHTML = `
+                        <strong>${medicine.name}</strong> - ${medicine.dosage}<br>
+                        Time: ${medicine.time} | Tablets: ${medicine.tablets}
+                    `;
+                    todaysMedicines.appendChild(div);
+                    count++;
+                }
+            });
+
+            if (count === 0) {
+                todaysMedicines.innerHTML = `<p data-translate="noMedicines">No medicines scheduled for today</p>`;
+            }
+        }
+
+        function updateUpcomingDoses() {
+            const upcomingDosesEl = document.getElementById('upcomingDoses');
+            upcomingDosesEl.innerHTML = '';
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            let count = 0;
+
+            const upcoming = userMedicines.filter(med => {
+                const [hours, minutes] = med.time.split(':');
+                const doseTime = new Date();
+                doseTime.setHours(hours, minutes, 0, 0);
+                
+                return doseTime > now && doseTime <= tomorrow;
+            }).sort((a, b) => a.time.localeCompare(b.time));
+
+            upcoming.forEach(medicine => {
+                const div = document.createElement('div');
+                div.className = 'dose-item';
+                div.innerHTML = `
+                    <strong>${medicine.name}</strong> - ${medicine.dosage}<br>
+                    Time: ${medicine.time} (Today)
+                `;
+                upcomingDosesEl.appendChild(div);
+                count++;
+            });
+
+            if (count === 0) {
+                upcomingDosesEl.innerHTML = `<p data-translate="noUpcomingDoses">No upcoming doses in the next 24 hours</p>`;
+            }
+        }
+        
+        function updateProgress(taken, skipped) {
+            const progressContent = document.getElementById('progressContent');
+            if (taken === 0 && skipped === 0) {
+                progressContent.innerHTML = `<p data-translate="noProgress">No medication history found for the last 7 days.</p>`;
+                return;
+            }
+            
+            const total = taken + skipped;
+            const compliance = Math.round((taken / total) * 100);
+            
+            progressContent.innerHTML = `
+                <h3>Compliance (Last 7 Days)</h3>
+                <h1 style="font-size: 48px; color: ${compliance >= 80 ? '#4caf50' : '#f44336'};">${compliance}%</h1>
+                <p>You have taken <strong>${taken}</strong> out of <strong>${total}</strong> scheduled doses.</p>
+                <p>Skipped: ${skipped}</p>
+            `;
+        }
+
+        // --- FIREBASE WRITE FUNCTIONS ---
+
+        async function addMedicine(event) {
+            event.preventDefault();
+            if (!currentUserId) return;
+
+            const medicineEntries = document.querySelectorAll('#medicineEntries .medicine-entry');
+            const startDate = new Date().toISOString().split('T')[0];
+            const medicinesRef = collection(db, 'users', currentUserId, 'medicines');
+
+            try {
+                for (const entry of medicineEntries) {
+                    await addDoc(medicinesRef, {
+                        name: entry.querySelector('.medicine-name').value,
+                        dosage: entry.querySelector('.medicine-dosage').value,
+                        time: entry.querySelector('.medicine-time').value,
+                        duration: parseInt(entry.querySelector('.medicine-duration').value),
+                        tablets: parseInt(entry.querySelector('.medicine-tablets').value),
+                        startDate,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                alert('Medicines added successfully!');
+                closeAddMedicineModal();
+                document.getElementById('medicineForm').reset();
+                const entriesContainer = document.getElementById('medicineEntries');
+                entriesContainer.innerHTML = '';
+                addAnotherMedicine();
+                const firstEntryBtn = entriesContainer.querySelector('.remove-entry-btn');
+                if(firstEntryBtn) firstEntryBtn.remove();
+            } catch (error) {
+                console.error("Error adding medicine: ", error);
+                alert('Failed to add medicine: ' + error.message);
+            }
+        }
+
+        async function deleteMedicine(medicineId) {
+            if (!currentUserId) return;
+            if (!confirm('Are you sure you want to delete this medicine?')) return;
+            try {
+                const medDocRef = doc(db, 'users', currentUserId, 'medicines', medicineId);
+                await deleteDoc(medDocRef);
+                alert('Medicine deleted successfully.');
+            } catch (error) {
+                console.error("Error deleting medicine: ", error);
+                alert('Failed to delete medicine: ' + error.message);
+            }
+        }
+        
+        async function logMedicationStatus(medicine, status, reason = null) {
+            if (!currentUserId || !medicine) return;
+            
+            const historyRef = collection(db, 'users', currentUserId, 'medication_history');
+            try {
+                await addDoc(historyRef, {
+                    medicineId: medicine.id,
+                    name: medicine.name,
+                    dosage: medicine.dosage,
+                    status: status,
+                    reason: reason,
+                    timestamp: Timestamp.now()
+                });
+                console.log(`Logged ${status} for ${medicine.name}`);
+            } catch (error) {
+                console.error("Error logging history: ", error);
+            }
+        }
+
+        // --- NOTIFICATION LOGIC (WITH 10s SOUND) ---
+        function startNotificationCheck() {
+            if (notificationInterval) clearInterval(notificationInterval);
+            notificationInterval = setInterval(checkDoses, 60000); // Check every minute
+            checkDoses(); // Check immediately
+        }
+        
+        function checkDoses() {
+            if (document.getElementById('notification').classList.contains('active')) return;
+
+            const now = new Date();
+            const currentTime = now.toTimeString().substring(0, 5); // "HH:MM"
+            const todayStr = now.toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+            const dueMedicine = userMedicines.find(med => {
+                if (med.time !== currentTime) return false;
+                
+                const startDate = new Date(med.startDate);
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + parseInt(med.duration));
+                if (now < startDate || now >= endDate) return false;
+                
+                const alreadyLogged = medicationHistory.find(log => {
+                    const logDateStr = log.timestamp.toDate().toISOString().split('T')[0];
+                    return log.medicineId === med.id && logDateStr === todayStr && log.timestamp.toDate().getHours() === now.getHours();
+                });
+                return !alreadyLogged;
+            });
+
+            if (dueMedicine) {
+                showNotification(dueMedicine);
+            }
+        }
+
+        function showNotification(medicine) {
+            currentNotification = medicine;
+            document.getElementById('notificationMessage').innerText = `It's time to take your ${medicine.name} (${medicine.dosage}).`;
+            document.getElementById('notification').classList.add('active');
+            
+            // Play sound with 10-second logic
+            notificationSound.loop = true;
+            notificationSound.play().catch(e => console.warn("Audio play was blocked by browser. User must interact with page first."));
+            
+            // Clear any existing timeout and set a new one for 10 seconds
+            if (currentSoundInterval) clearTimeout(currentSoundInterval);
+            currentSoundInterval = setTimeout(stopSound, 10000); 
+        }
+
+        function stopSound() {
+            notificationSound.pause();
+            notificationSound.currentTime = 0;
+            notificationSound.loop = false;
+            if (currentSoundInterval) {
+                clearTimeout(currentSoundInterval);
+                currentSoundInterval = null;
+            }
+        }
+
+        function stopNotification(userClickedStop = false) {
+            document.getElementById('notification').classList.remove('active');
+            stopSound(); // Stop the sound
+            if (userClickedStop) {
+                // If user clicks "Stop for Today", we can log it as 'skipped'
+                logMedicationStatus(currentNotification, 'skipped', 'Stopped by user');
+                currentNotification = null; // Clear it
+            }
+            // If they clicked 'Taken' or 'Skip', those functions will handle logging
+        }
+
+        function markAsTaken() {
+            logMedicationStatus(currentNotification, 'taken');
+            stopNotification(false); // Close UI, stop sound
+            currentNotification = null; // Clear it
+        }
+
+        function skipDose() {
+            stopNotification(false); // Close UI, stop sound
+            document.getElementById('skipReasonModal').classList.add('active');
+            // currentNotification remains active until a reason is selected
+        }
+
+        function selectSkipReason(reason) {
+            logMedicationStatus(currentNotification, 'skipped', reason);
+            closeSkipModal();
+        }
+        
+        function closeSkipModal() {
+            document.getElementById('skipReasonModal').classList.remove('active');
+            currentNotification = null; // Now we can clear it
+        }
+
+        // --- OTHER UI FUNCTIONS ---
+
+        async function logout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed', error);
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById(sectionId + 'Section').style.display = 'block';
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            document.querySelector(`.menu-item[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-visible');
+        }
+
+        function openAddMedicineModal() {
+            document.getElementById('addMedicineModal').classList.add('active');
+        }
+
+        function closeAddMedicineModal() {
+            document.getElementById('addMedicineModal').classList.remove('active');
+        }
+
+        function addAnotherMedicine() {
+            const container = document.getElementById('medicineEntries');
+            const newEntry = document.createElement('div');
+            newEntry.className = 'medicine-entry';
+            newEntry.innerHTML = `
+                ${container.children.length > 0 ? '<button type="button" class="remove-entry-btn" onclick="this.parentElement.remove()">×</button>' : ''}
+                <div class="form-group">
+                    <label data-translate="medicineName">Medicine Name</label>
+                    <input type="text" class="medicine-name" required>
+                </div>
+                <div class="form-group">
+                    <label data-translate="dosage">Dosage (e.g., 50mg)</label>
+                    <input type="text" class="medicine-dosage" required>
+                </div>
+                <div class="form-group">
+                    <label data-translate="timing">Time</label>
+                    <input type="time" class="medicine-time" required>
+                </div>
+                <div class="form-group">
+                    <label data-translate="duration">Duration (days)</label>
+                    <input type="number" class="medicine-duration" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label data-translate="tablets">Tablets per dose</label>
+                    <input type="number" class="medicine-tablets" min="1" value="1" required>
+                </div>
+            `;
+            container.appendChild(newEntry);
+            setLanguage(localStorage.getItem('mediTrackLang') || 'en');
+        }
+
+        function toggleChatbot() {
+            document.getElementById('chatbotWindow').classList.toggle('active');
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chatbotInput');
+            const messagesContainer = document.getElementById('chatbotMessages');
+            const messageText = input.value.trim();
+            if (messageText === '') return;
+
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chatbot-message user';
+            userMessage.textContent = messageText;
+            messagesContainer.appendChild(userMessage);
+            
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            setTimeout(() => {
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chatbot-message bot';
+                botMessage.textContent = "I am a simple bot. I am still learning!";
+                messagesContainer.appendChild(botMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+
+        // --- EXPORT FUNCTIONS TO WINDOW ---
+        window.setupRealtimeListeners = setupRealtimeListeners;
+        window.addMedicine = addMedicine;
+        window.deleteMedicine = deleteMedicine;
+        window.logout = logout;
+        window.showSection = showSection;
+        window.toggleSidebar = toggleSidebar;
+        window.openAddMedicineModal = openAddMedicineModal;
+        window.closeAddMedicineModal = closeAddMedicineModal;
+        window.addAnotherMedicine = addAnotherMedicine;
+        window.toggleChatbot = toggleChatbot;
+        window.sendChatMessage = sendChatMessage;
+        window.changeLanguage = changeLanguage;
+        window.markAsTaken = markAsTaken;
+        window.skipDose = skipDose;
+        window.stopNotification = stopNotification;
+        window.closeSkipModal = closeSkipModal;
+        window.selectSkipReason = selectSkipReason;
+
+    </script>
+    
+</body>
+</html>

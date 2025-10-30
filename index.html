@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MediTrack - Sign In / Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .tab-container {
+            display: flex;
+            background: #f5f5f5;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .form-container {
+            padding: 25px 20px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .gender-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .gender-option {
+            padding: 12px 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .gender-option input {
+            display: none;
+        }
+
+        .gender-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+            color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            touch-action: manipulation;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            font-size: 14px;
+        }
+
+        /* Mobile specific optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 25px 15px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header p {
+                font-size: 13px;
+            }
+            
+            .form-container {
+                padding: 20px 15px;
+            }
+
+            .tab {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+
+            input, select {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .gender-option {
+                padding: 10px 6px;
+                font-size: 12px;
+            }
+
+            button {
+                padding: 13px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .gender-options {
+                gap: 6px;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 20px 15px;
+            }
+
+            .form-container {
+                max-height: 60vh;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💊 MediTrack</h1>
+            <p data-translate="tagline">Your Personal Medicine Companion</p>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab active" onclick="switchTab('signin')" data-translate="signin">Sign In</div>
+            <div class="tab" onclick="switchTab('signup')" data-translate="signup">Sign Up</div>
+        </div>
+
+        <div class="form-container">
+            <div class="success-message" id="successMessage"></div>
+
+            <div class="form-section active" id="signinForm">
+                <form onsubmit="handleSignIn(event)">
+                    <div class="form-group">
+                        <label data-translate="email">Email</label>
+                        <input type="email" id="signinEmail" required autocomplete="email">
+                        <span class="error-message" id="signinEmailError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="password">Password</label>
+                        <input type="password" id="signinPassword" required autocomplete="current-password">
+                        <span class="error-message" id="signinPasswordError"></span>
+                    </div>
+                    <button type="submit" data-translate="signinBtn">Sign In</button>
+                </form>
+            </div>
+
+            <div class="form-section" id="signupForm">
+                <form onsubmit="handleSignUp(event)">
+                    <div class="form-group">
+                        <label data-translate="name">Full Name</label>
+                        <input type="text" id="signupName" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="age">Age</label>
+                        <input type="number" id="signupAge" min="1" max="120" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="dob">Date of Birth</label>
+                        <input type="date" id="signupDOB" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="gender">Gender</label>
+                        <div class="gender-options">
+                            <div class="gender-option" onclick="selectGender(event, 'male')">
+                                <input type="radio" name="gender" value="male" id="genderMale">
+                                <span data-translate="male">Male</span>
+                            </div>
+                            <div class="gender-option" onclick="selectGender(event, 'female')">
+                                <input type="radio" name="gender" value="female" id="genderFemale">
+                                <span data-translate="female">Female</span>
+                            </div>
+                            <div class="gender-option" onclick="selectGender(event, 'other')">
+                                <input type="radio" name="gender" value="other" id="genderOther">
+                                <span data-translate="other">Other</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="email">Email</label>
+                        <input type="email" id="signupEmail" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="password">Password</label>
+                        <input type="password" id="signupPassword" minlength="6" required autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="bloodGroup">Blood Group (Optional)</label>
+                        <select id="signupBloodGroup">
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="phone">Phone Number (Optional)</label>
+                        <input type="tel" id="signupPhone" autocomplete="tel">
+                    </div>
+                    <div class="form-group">
+                        <label data-translate="emergencyContact">Emergency Contact (Optional)</label>
+                        <input type="tel" id="signupEmergencyContact" autocomplete="tel">
+                    </div>
+                    <button type="submit" data-translate="signupBtn">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDErLV4jxywlK5bVYFVwylQ6z2wgo-1f-w",
+            authDomain: "developers-man.firebaseapp.com",
+            databaseURL: "https://developers-man-default-rtdb.firebaseio.com",
+            projectId: "developers-man",
+            storageBucket: "developers-man.firebasestorage.app",
+            messagingSenderId: "34230860300",
+            appId: "1:34230860300:web:048c7679e3e62ae0290c29",
+            measurementId: "G-9WH11XR9JM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            const forms = document.querySelectorAll('.form-section');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'signin') {
+                tabs[0].classList.add('active');
+                document.getElementById('signinForm').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('signupForm').classList.add('active');
+            }
+        }
+
+        function selectGender(event, gender) {
+            document.querySelectorAll('.gender-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            document.getElementById('gender' + gender.charAt(0).toUpperCase() + gender.slice(1)).checked = true;
+        }
+
+        async function handleSignIn(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signinEmail').value;
+            const password = document.getElementById('signinPassword').value;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                localStorage.setItem('currentUser', JSON.stringify({
+                    uid: userCredential.user.uid,
+                    email: userCredential.user.email
+                }));
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert('Sign in failed: ' + error.message);
+            }
+        }
+
+        async function handleSignUp(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const age = document.getElementById('signupAge').value;
+            const dob = document.getElementById('signupDOB').value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const bloodGroup = document.getElementById('signupBloodGroup').value;
+            const phone = document.getElementById('signupPhone').value;
+            const emergencyContact = document.getElementById('signupEmergencyContact').value;
+
+            if (!gender) {
+                alert('Please select a gender');
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await setDoc(doc(db, 'users', user.uid), {
+                    name,
+                    age: parseInt(age),
+                    dob,
+                    gender,
+                    email,
+                    bloodGroup,
+                    phone,
+                    emergencyContact,
+                    createdAt: new Date().toISOString()
+                });
+
+                localStorage.setItem('currentUser', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    name
+                }));
+
+                document.getElementById('successMessage').textContent = 'Account created successfully! Redirecting...';
+                document.getElementById('successMessage').style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } catch (error) {
+                alert('Sign up failed: ' + error.message);
+            }
+        }
+
+        window.switchTab = switchTab;
+        window.selectGender = selectGender;
+        window.handleSignIn = handleSignIn;
+        window.handleSignUp = handleSignUp;
+    </script>
+
+    <script src="translations.js"></script>
+</body>
+</html>

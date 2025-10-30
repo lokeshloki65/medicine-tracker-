@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrack - Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 30px 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 30px;
+        }
+
+        .content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .settings-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .setting-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .setting-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        select, input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="logo">💊 MediTrack</div>
+            <div class="menu">
+                <a href="dashboard.html" class="menu-item"><span>📊</span> Dashboard</a>
+                <a href="dashboard.html#progress" class="menu-item"><span>📈</span> Progress</a>
+                <a href="dashboard.html#history" class="menu-item"><span>📜</span> History</a>
+                <a href="medicine-analyser.html" class="menu-item"><span>🔬</span> Medicine Analyser</a>
+                <a href="profile.html" class="menu-item"><span>👤</span> Profile</a>
+                <a href="settings.html" class="menu-item" style="background: rgba(255,255,255,0.2);"><span>⚙️</span> Settings</a>
+                <a href="#" class="menu-item" onclick="logout()"><span>🚪</span> Logout</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="header">
+                <h1 data-translate="settings">⚙️ Settings</h1>
+            </div>
+
+            <div class="card">
+                <!-- Notifications Section -->
+                <div class="settings-section">
+                    <h3>Notification Settings</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Enable Notifications</h4>
+                            <p>Receive reminders for your medicine schedule</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enableNotifications" checked onchange="saveSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Notification Sound</h4>
+                            <p>Play sound with medicine reminders</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notificationSound" checked onchange="saveSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Reminder Before</h4>
+                            <p>Get notified before medicine time</p>
+                        </div>
+                        <select id="reminderBefore" onchange="saveSettings()">
+                            <option value="0">At exact time</option>
+                            <option value="5">5 minutes before</option>
+                            <option value="10">10 minutes before</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Snooze Duration</h4>
+                            <p>Time to wait before next reminder</p>
+                        </div>
+                        <select id="snoozeDuration" onchange="saveSettings()">
+                            <option value="5">5 minutes</option>
+                            <option value="10">10 minutes</option>
+                            <option value="15">15 minutes</option>
+                            <option value="20" selected>20 minutes</option>
+                            <option value="30">30 minutes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Language Section -->
+                <div class="settings-section">
+                    <h3>Language Preferences</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>App Language</h4>
+                            <p>Choose your preferred language</p>
+                        </div>
+                        <select id="appLanguage" onchange="changeAppLanguage()">
+                            <option value="en">English</option>
+                            <option value="ta">தமிழ் (Tamil)</option>
+                            <option value="hi">हिंदी (Hindi)</option>
+                            <option value="te">తెలుగు (Telugu)</option>
+                            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                            <option value="ml">മലയാളം (Malayalam)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Display Section -->
+                <div class="settings-section">
+                    <h3>Display Settings</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Dark Mode</h4>
+                            <p>Use dark theme for the app</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkMode" onchange="toggleDarkMode()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Show Completed Medicines</h4>
+                            <p>Display medicines you've already taken</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showCompleted" checked onchange="saveSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Privacy Section -->
+                <div class="settings-section">
+                    <h3>Privacy & Data</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Data Backup</h4>
+                            <p>Automatically backup your data to cloud</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="dataBackup" checked onchange="saveSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Share Analytics</h4>
+                            <p>Help improve the app by sharing anonymous usage data</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="shareAnalytics" onchange="saveSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Account Section -->
+                <div class="settings-section">
+                    <h3>Account Management</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Export Data</h4>
+                            <p>Download all your medicine data</p>
+                        </div>
+                        <button class="btn-danger" style="background: #667eea;" onclick="exportData()">Export</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Clear All Data</h4>
+                            <p>Delete all your medicines and history</p>
+                        </div>
+                        <button class="btn-danger" onclick="clearAllData()">Clear Data</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Delete Account</h4>
+                            <p>Permanently delete your account and all data</p>
+                        </div>
+                        <button class="btn-danger" onclick="deleteAccount()">Delete Account</button>
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <div class="settings-section">
+                    <h3>About</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Version</h4>
+                            <p>MediTrack v1.0.0</p>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Last Updated</h4>
+                            <p>October 2025</p>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Support</h4>
+                            <p>Contact us for help and feedback</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script>
+        // Load saved settings
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+        });
+
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+            
+            document.getElementById('enableNotifications').checked = settings.enableNotifications !== false;
+            document.getElementById('notificationSound').checked = settings.notificationSound !== false;
+            document.getElementById('reminderBefore').value = settings.reminderBefore || '0';
+            document.getElementById('snoozeDuration').value = settings.snoozeDuration || '20';
+            document.getElementById('darkMode').checked = settings.darkMode || false;
+            document.getElementById('showCompleted').checked = settings.showCompleted !== false;
+            document.getElementById('dataBackup').checked = settings.dataBackup !== false;
+            document.getElementById('shareAnalytics').checked = settings.shareAnalytics || false;
+            
+            const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+            document.getElementById('appLanguage').value = savedLang;
+        }
+
+        function saveSettings() {
+            const settings = {
+                enableNotifications: document.getElementById('enableNotifications').checked,
+                notificationSound: document.getElementById('notificationSound').checked,
+                reminderBefore: document.getElementById('reminderBefore').value,
+                snoozeDuration: document.getElementById('snoozeDuration').value,
+                darkMode: document.getElementById('darkMode').checked,
+                showCompleted: document.getElementById('showCompleted').checked,
+                dataBackup: document.getElementById('dataBackup').checked,
+                shareAnalytics: document.getElementById('shareAnalytics').checked
+            };
+            
+            localStorage.setItem('appSettings', JSON.stringify(settings));
+            
+            // Show confirmation
+            const feedback = document.createElement('div');
+            feedback.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #4caf50; color: white; padding: 15px 25px; border-radius: 10px; z-index: 9999;';
+            feedback.textContent = 'Settings saved successfully!';
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.remove();
+            }, 2000);
+        }
+
+        function changeAppLanguage() {
+            const lang = document.getElementById('appLanguage').value;
+            localStorage.setItem('preferredLanguage', lang);
+            
+            // Reload page to apply language
+            location.reload();
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.getElementById('darkMode').checked;
+            
+            if (isDark) {
+                document.body.style.background = '#1a1a1a';
+                document.querySelectorAll('.card, .header').forEach(el => {
+                    el.style.background = '#2d2d2d';
+                    el.style.color = '#ffffff';
+                });
+            } else {
+                document.body.style.background = '#f5f7fa';
+                document.querySelectorAll('.card, .header').forEach(el => {
+                    el.style.background = '#ffffff';
+                    el.style.color = '#333333';
+                });
+            }
+            
+            saveSettings();
+        }
+
+        async function exportData() {
+            if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+                alert('Please sign in to export data');
+                return;
+            }
+
+            try {
+                const userId = window.firebaseAuth.currentUser.uid;
+                const data = {
+                    exportDate: new Date().toISOString(),
+                    user: userId,
+                    medicines: [],
+                    logs: []
+                };
+
+                // Create and download JSON file
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `meditrack-data-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                alert('Data exported successfully!');
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Failed to export data');
+            }
+        }
+
+        async function clearAllData() {
+            if (!confirm('Are you sure you want to clear all your medicine data? This action cannot be undone.')) {
+                return;
+            }
+
+            if (!confirm('This will delete ALL your medicines and history. Are you absolutely sure?')) {
+                return;
+            }
+
+            try {
+                // Clear local storage
+                localStorage.removeItem('medicines');
+                localStorage.removeItem('medicineLogs');
+                
+                alert('All data cleared successfully!');
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error('Clear data error:', error);
+                alert('Failed to clear data');
+            }
+        }
+
+        async function deleteAccount() {
+            if (!confirm('Are you sure you want to delete your account? This action CANNOT be undone.')) {
+                return;
+            }
+
+            const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+            if (confirmation !== 'DELETE') {
+                alert('Account deletion cancelled');
+                return;
+            }
+
+            try {
+                if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+                    await window.firebaseAuth.currentUser.delete();
+                }
+                
+                localStorage.clear();
+                alert('Account deleted successfully');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Delete account error:', error);
+                alert('Failed to delete account. You may need to sign in again.');
+            }
+        }
+
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    if (window.firebaseAuth) {
+                        await window.firebaseAuth.signOut();
+                    }
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
