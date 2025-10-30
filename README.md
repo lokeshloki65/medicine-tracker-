@@ -218,4 +218,4 @@ This is a personal medicine tracking application. Use at your own discretion. Al
 
 **Important:** This application is for tracking purposes only and should not replace professional medical advice. Always consult with healthcare providers for medical decisions.
 
-**Developed with ❤️ for better health management**
+**Developed with LokeshLoki -- for better health management**
