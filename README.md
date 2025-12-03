@@ -2,7 +2,7 @@
 
 ## 🌟 Features  
 
-### ✅ Complete Features Implemented:
+### ✅ Complete Features Implemented: 
 - **Sign In/Sign Up System** with Firebase Authentication
 - **Dashboard** with medicine management
 - **Add Multiple Medicines** at once
