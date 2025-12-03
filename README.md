@@ -1,6 +1,6 @@
 # MediTrack - Medicine Tracker Application
 
-## 🌟 Features 
+## 🌟 Features  
 
 ### ✅ Complete Features Implemented:
 - **Sign In/Sign Up System** with Firebase Authentication
