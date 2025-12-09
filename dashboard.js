@@ -1,7 +1,7 @@
 // Dashboard functionality
 let currentMedicine = null;
 let notificationInterval = null;
-let skipCount = 0;
+let skipCount = 0; 
 let currentNotificationMedicine = null;
 
 function toggleSidebar() {
