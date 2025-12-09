@@ -8,7 +8,7 @@ function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('mobile-visible');
 } 
-
+ 
 function showSection(section) {
     // Hide all sections
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
