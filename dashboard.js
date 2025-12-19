@@ -6,7 +6,7 @@ let currentNotificationMedicine = null;
  
 function toggleSidebar() {  
     const sidebar = document.getElementById('sidebar'); 
-    sidebar.classList.toggle('mobile-visible'); 
+    sidebar.classList.toggle('mobile-visible');  
 }  
   
 function showSection(section) {
