@@ -3,7 +3,7 @@ let currentMedicine = null;
 let notificationInterval = null;
 let skipCount = 0; 
 let currentNotificationMedicine = null;
-
+ 
 function toggleSidebar() {  
     const sidebar = document.getElementById('sidebar'); 
     sidebar.classList.toggle('mobile-visible'); 
